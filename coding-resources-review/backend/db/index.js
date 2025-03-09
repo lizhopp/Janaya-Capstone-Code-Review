@@ -1,17 +1,14 @@
-const pg = require('pg')// imports the pg
+const { Client } = require('pg')// imports the pg
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const JWT = process.env.JWT || "Crytobytes";
 require("dotenv").config()
-const app = express();
 const express = require('express');
+
 
 // middleware 
 app.use(express.json());
 
-const { Client } = require('pg');
-const bcrypt = require('bcrypt');
-require('dotenv').config();
-const express = require('express');
 
 // Initialize the client
 const client = new Client({
@@ -19,10 +16,7 @@ const client = new Client({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
 });
 
-// Connect to the database
-client.connect()
-  .then(() => console.log('Connected to the database'))
-  .catch(err => console.error('Connection error', err.stack));
+
 
 /**
  * USER Methods
