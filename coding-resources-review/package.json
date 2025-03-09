@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "seed:dev": "nodemon ./db/seed.js",
+    "seed": "node ./db/seed.js",
+    "start": "node index.js",
     "start:dev": "nodemon index.js"
   },
   "keywords": [],
@@ -10,7 +13,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "pg": "^8.13.3"
   },
