@@ -1,11 +1,11 @@
 {
   "name": "coding-resources-review",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "db/index.js",
   "scripts": {
     "seed:dev": "nodemon ./db/seed.js",
     "seed": "node ./db/seed.js",
-    "start": "node index.js",
+    "start": "node db/index.js",
     "start:dev": "nodemon index.js"
   },
   "keywords": [],
