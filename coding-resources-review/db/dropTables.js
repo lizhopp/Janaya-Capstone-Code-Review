@@ -1,4 +1,4 @@
-onst client = require('./db');
+const client = require('./db');
 
 async function dropTables() {
   try {
