@@ -53,6 +53,7 @@ async function createTables() {
     `);
 
     if (!resourcesTableExists.rows[0].exists) {
+        // creating the resources table 
       await client.query(`
         CREATE TYPE resource_type AS ENUM ('video', 'book', 'article');
         CREATE TABLE resources (
@@ -62,6 +63,7 @@ async function createTables() {
           language VARCHAR(255) NOT NULL,
           link VARCHAR(255) NOT NULL,
           description TEXT,
+          ALTER TABLE resources ADD COLUMN product_id INT;
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -77,6 +79,7 @@ async function createTables() {
     `);
 
     if (!reviewsTableExists.rows[0].exists) {
+        // creating the review table 
       await client.query(`
         CREATE TABLE reviews (
           id SERIAL PRIMARY KEY,
@@ -99,6 +102,8 @@ async function createTables() {
     `);
 
     if (!favoritesTableExists.rows[0].exists) {
+
+        // creating favorites table 
       await client.query(`
         CREATE TABLE favorites (
           id SERIAL PRIMARY KEY,
