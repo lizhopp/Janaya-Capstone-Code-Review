@@ -1,22 +1,61 @@
-const express = require('express');
+const express = require("express");
+const client = require("./db");
 const app = express();
-const users= ()
+const PORT = process.env.PORT || 3000;
 
+// Middleware to parse JSON bodies
+app.use(express.json());
 
+// Routes for get all resources
 
+app.get("/api/resources", async (req, res) => {
+  try {
+    const result = await client.query("SELECT * FROM resources");
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching resources:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
+// Routes to get single resource by ID
+app.get("/api/resources/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await client.query("SELECT * FROM resources WHERE id = $1", [
+      id,
+    ]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Resource not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching resource:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
+// Route to create a new resource
+app.post("/api/resources", async (req, res) => {
+  try {
+    const { title, type, language, link, description } = req.body;
+    const result = await client.query(
+      "INSERT INTO resources (title, type, language, link, description) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [title, type, language, link, description]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error creating resource:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
 
-
-
-
-
-
-
-
-
-// start over 
+// start over
 
 // const pg = require ("pg");
 // const bcrypt = require('bcrypt');
@@ -26,18 +65,14 @@ const users= ()
 // const express = require('express');
 // const app = express(); // Define the app
 
-
-// // middleware 
+// // middleware
 // app.use(express.json());
-
 
 // // Initialize the client
 // const client = new pg.Client(
 //   process.env.DATABASE_URL || 'postgres://localhost/coding_resources_db',
 
 // });
-
-
 
 // /**
 //  * USER Methods
@@ -48,9 +83,9 @@ const users= ()
 //   try {
 //     const hashedPassword = await bcrypt.hash(password, 10);
 //     const { rows: [user] } = await client.query(`
-//       INSERT INTO users(username, email, password) 
-//       VALUES($1, $2, $3) 
-//       ON CONFLICT (username) DO NOTHING 
+//       INSERT INTO users(username, email, password)
+//       VALUES($1, $2, $3)
+//       ON CONFLICT (username) DO NOTHING
 //       RETURNING *;
 //     `, [username, email, hashedPassword]);
 
@@ -146,8 +181,8 @@ const users= ()
 // async function createResource({ title, type, language, link, description }) {
 //   try {
 //     const { rows: [resource] } = await client.query(`
-//       INSERT INTO resources(title, type, language, link, description) 
-//       VALUES($1, $2, $3, $4, $5) 
+//       INSERT INTO resources(title, type, language, link, description)
+//       VALUES($1, $2, $3, $4, $5)
 //       RETURNING *;
 //     `, [title, type, language, link, description]);
 
@@ -238,8 +273,8 @@ const users= ()
 // async function createReview({ userId, resourceId, rating, comment }) {
 //   try {
 //     const { rows: [review] } = await client.query(`
-//       INSERT INTO reviews(user_id, resource_id, rating, comment) 
-//       VALUES($1, $2, $3, $4) 
+//       INSERT INTO reviews(user_id, resource_id, rating, comment)
+//       VALUES($1, $2, $3, $4)
 //       RETURNING *;
 //     `, [userId, resourceId, rating, comment]);
 
@@ -270,8 +305,8 @@ const users= ()
 // async function addFavorite({ userId, resourceId }) {
 //   try {
 //     const { rows: [favorite] } = await client.query(`
-//       INSERT INTO favorites(user_id, resource_id) 
-//       VALUES($1, $2) 
+//       INSERT INTO favorites(user_id, resource_id)
+//       VALUES($1, $2)
 //       RETURNING *;
 //     `, [userId, resourceId]);
 
@@ -329,4 +364,3 @@ const users= ()
 //   removeFavorite,
 //   getFavoritesByUserId
 // };
-

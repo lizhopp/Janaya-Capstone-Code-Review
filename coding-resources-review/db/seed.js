@@ -1,8 +1,8 @@
-const client = require('./db');
+const client = require("./db");
 
 async function seedDatabase() {
   try {
-    console.log('Starting to seed database...');
+    console.log("Starting to seed database...");
 
     // Insert users
     await client.query(`
@@ -40,9 +40,9 @@ async function seedDatabase() {
         (2, 3);
     `);
 
-    console.log('Finished seeding database!');
+    console.log("Finished seeding database!");
   } catch (error) {
-    console.error('Error seeding database:', error.message);
+    console.error("Error seeding database:", error.message);
     throw error;
   }
 }
