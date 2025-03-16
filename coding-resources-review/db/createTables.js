@@ -63,12 +63,13 @@ async function createTables() {
           language VARCHAR(255) NOT NULL,
           link VARCHAR(255) NOT NULL,
           description TEXT,
-          ALTER TABLE resources ADD COLUMN product_id INT;
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
       `);
     }
+
+  
 
     // Check if the 'reviews' table exists
     const reviewsTableExists = await client.query(`
