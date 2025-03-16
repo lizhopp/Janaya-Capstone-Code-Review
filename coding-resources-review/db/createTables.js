@@ -63,6 +63,7 @@ async function createTables() {
           language VARCHAR(255) NOT NULL,
           link VARCHAR(255) NOT NULL,
           description TEXT,
+          product_id INT NOT NULL,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
