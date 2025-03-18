@@ -1,57 +1,70 @@
-// const express = require('express');
-// const { getAllResources, getResourceById, createResource, updateResource, deleteResource } = require('../db');
-// const { requireUser } = require('./utils');
+const client = require('./db');
 
-// const resourcesRouter = express.Router();
+async function createResource({ title, type, language, link, description }) {
+  try {
+    const { rows: [resource] } = await client.query(`
+      INSERT INTO resources(title, type, language, link, description) 
+      VALUES($1, $2, $3, $4, $5) 
+      RETURNING *;
+    `, [title, type, language, link, description]);
 
-// // Get all resources
-// resourcesRouter.get('/', async (req, res, next) => {
-//   try {
-//     const resources = await getAllResources();
-//     res.json(resources);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+    return resource;
+  } catch (error) {
+    throw new Error(`Error creating resource: ${error.message}`);
+  }
+}
 
-// // Get a resource by ID
-// resourcesRouter.get('/:id', async (req, res, next) => {
-//   try {
-//     const resource = await getResourceById(req.params.id);
-//     res.json(resource);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+async function updateResource(resourceId, fields = {}) {
+  const setString = Object.keys(fields).map((key, index) => `"${key}"=$${index + 1}`).join(', ');
+  if (!setString.length) throw new Error('No fields to update');
 
-// // Create a new resource (requires authentication)
-// resourcesRouter.post('/', requireUser, async (req, res, next) => {
-//   try {
-//     const resource = await createResource(req.body);
-//     res.status(201).json(resource);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+  try {
+    const { rows: [resource] } = await client.query(`
+      UPDATE resources
+      SET ${setString}
+      WHERE id=${resourceId}
+      RETURNING *;
+    `, Object.values(fields));
 
-// // Update a resource (requires authentication)
-// resourcesRouter.patch('/:id', requireUser, async (req, res, next) => {
-//   try {
-//     const resource = await updateResource(req.params.id, req.body);
-//     res.json(resource);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+    return resource;
+  } catch (error) {
+    throw new Error(`Error updating resource: ${error.message}`);
+  }
+}
 
-// // Delete a resource (requires authentication)
-// resourcesRouter.delete('/:id', requireUser, async (req, res, next) => {
-//   try {
-//     const resource = await deleteResource(req.params.id);
-//     res.json(resource);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
+async function getAllResources() {
+  try {
+    const { rows } = await client.query('SELECT * FROM resources;');
+    return rows;
+  } catch (error) {
+    throw new Error(`Error fetching resources: ${error.message}`);
+  }
+}
 
-// module.exports = resourcesRouter;
+async function getResourceById(resourceId) {
+  try {
+    const { rows: [resource] } = await client.query('SELECT * FROM resources WHERE id=$1;', [resourceId]);
+    if (!resource) throw new Error('Resource not found');
+    return resource;
+  } catch (error) {
+    throw new Error(`Error fetching resource: ${error.message}`);
+  }
+}
+
+async function deleteResource(resourceId) {
+  try {
+    const { rows: [resource] } = await client.query('DELETE FROM resources WHERE id=$1 RETURNING *;', [resourceId]);
+    if (!resource) throw new Error('Resource not found');
+    return resource;
+  } catch (error) {
+    throw new Error(`Error deleting resource: ${error.message}`);
+  }
+}
+
+module.exports = {
+  createResource,
+  updateResource,
+  getAllResources,
+  getResourceById,
+  deleteResource,
+};

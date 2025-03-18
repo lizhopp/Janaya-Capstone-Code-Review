@@ -1,37 +1,89 @@
-// const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const client = require('./db');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT || "Crytobytes";
 
-// app.post('/api/register', async (req, res) => {
-//   try {
-//     const { username, email, password } = req.body;
-//     const hashedPassword = await bcrypt.hash(password, 10);
-//     const result = await client.query(
-//       'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *',
-//       [username, email, hashedPassword]
-//     );
-//     res.status(201).json(result.rows[0]);
-//   } catch (error) {
-//     console.error('Error registering user:', error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
-// app.post('/api/login', async (req, res) => {
-//     try {
-//       const { email, password } = req.body;
-//       const result = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-//       if (result.rows.length === 0) {
-//         return res.status(401).json({ error: 'Invalid email or password' });
-//       }
-//       const user = result.rows[0];
-//       const passwordMatch = await bcrypt.compare(password, user.password);
-//       if (!passwordMatch) {
-//         return res.status(401).json({ error: 'Invalid email or password' });
-//       }
-//       const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-//       res.status(200).json({ token });
-//     } catch (error) {
-//       console.error('Error logging in:', error);
-//       res.status(500).json({ error: 'Internal Server Error' });
-//     }
-//   });
-// // 
+async function createUser({ username, email, password }) {
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const { rows: [user] } = await client.query(`
+      INSERT INTO users(username, email, password) 
+      VALUES($1, $2, $3) 
+      ON CONFLICT (username) DO NOTHING 
+      RETURNING *;
+    `, [username, email, hashedPassword]);
+
+    if (!user) throw new Error('Username already exists');
+    return user;
+  } catch (error) {
+    throw new Error(`Error creating user: ${error.message}`);
+  }
+}
+
+async function updateUser(id, fields = {}) {
+  const setString = Object.keys(fields).map((key, index) => `"${key}"=$${index + 1}`).join(', ');
+  if (!setString.length) throw new Error('No fields to update');
+
+  try {
+    const { rows: [user] } = await client.query(`
+      UPDATE users
+      SET ${setString}
+      WHERE id=${id}
+      RETURNING *;
+    `, Object.values(fields));
+
+    return user;
+  } catch (error) {
+    throw new Error(`Error updating user: ${error.message}`);
+  }
+}
+
+async function getAllUsers() {
+  try {
+    const { rows } = await client.query('SELECT id, username, email FROM users;');
+    return rows;
+  } catch (error) {
+    throw new Error(`Error fetching users: ${error.message}`);
+  }
+}
+
+async function getUserById(userId) {
+  try {
+    const { rows: [user] } = await client.query('SELECT id, username, email FROM users WHERE id=$1;', [userId]);
+    if (!user) throw new Error('User not found');
+    return user;
+  } catch (error) {
+    throw new Error(`Error fetching user: ${error.message}`);
+  }
+}
+
+async function getUserByUsername(username) {
+  try {
+    const { rows: [user] } = await client.query('SELECT * FROM users WHERE username=$1;', [username]);
+    if (!user) throw new Error('User not found');
+    return user;
+  } catch (error) {
+    throw new Error(`Error fetching user: ${error.message}`);
+  }
+}
+
+async function authenticateUser({ username, password }) {
+  try {
+    const user = await getUserByUsername(username);
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) throw new Error('Invalid password');
+    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+    return { user, token };
+  } catch (error) {
+    throw new Error(`Error authenticating user: ${error.message}`);
+  }
+}
+
+module.exports = {
+  createUser,
+  updateUser,
+  getAllUsers,
+  getUserById,
+  getUserByUsername,
+  authenticateUser,
+};

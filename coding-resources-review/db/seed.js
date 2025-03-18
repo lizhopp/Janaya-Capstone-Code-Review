@@ -8,9 +8,11 @@ async function seedDatabase() {
     await client.query(`
       INSERT INTO users (username, email, password, isAdmin)
       VALUES
-        ('admin', 'admin@example.com', 'admin123', TRUE),
-        ('user1', 'user1@example.com', 'user123', FALSE),
-        ('user2', 'user2@example.com', 'user123', FALSE);
+        ('admin', 'admin@gmail.com', 'admin123', TRUE),
+        ('testuser','testuser@gmail.com', 'testuser123',TRUE),
+        ('guestuser','guestuser@gmail.com', 'guestuser123',TRUE),
+        ('user1', 'user1@gmail.com', 'user123', FALSE),
+        ('user2', 'user2@gmail.com', 'user123', FALSE);
     `);
 
     // Insert resources
