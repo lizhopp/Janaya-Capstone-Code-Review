@@ -57,3 +57,11 @@ coding_review_db=# \d
  public | users            | table    | janayacooper
  public | users_id_seq     | sequence | janayacooper
 (8 rows)
+
+coding_review_db=# SELECT * FROM users;
+ id | username |      email      | password | isadmin |         created_at         |         updated_at         
+----+----------+-----------------+----------+---------+----------------------------+----------------------------
+  1 | admin    | admin@gmail.com | admin123 | t       | 2025-03-18 19:43:54.357697 | 2025-03-18 19:43:54.357697
+  2 | user1    | user1@gmail.com | user123  | f       | 2025-03-18 19:43:54.357697 | 2025-03-18 19:43:54.357697
+  3 | user2    | user2@gmail.com | user123  | f       | 2025-03-18 19:43:54.357697 | 2025-03-18 19:43:54.357697
+(3 rows)

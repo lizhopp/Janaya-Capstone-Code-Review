@@ -107,13 +107,16 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('Login request:', { email, password });// testing 
     const result = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+    console.log('User from database:', result.rows[0]);
     if (result.rows.length === 0) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     const user = result.rows[0];
     const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log('Password match:', isPasswordValid);
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
