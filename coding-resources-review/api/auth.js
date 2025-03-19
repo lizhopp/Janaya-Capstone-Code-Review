@@ -1,20 +1,28 @@
-const client = require('./db');
-const bcrypt = require('bcrypt');
+const { hashPasswords } = require('./utils');
 
-async function hashPasswords() {
-  try {
-    const users = await client.query('SELECT id, password FROM users');
-    for (const user of users.rows) {
-      const hashedPassword = await bcrypt.hash(user.password, 10);
-      await client.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, user.id]);
+async function registerUser({ username, email, password }) {
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const { rows: [user] } = await client.query(`
+        INSERT INTO users(username, email, password) 
+        VALUES($1, $2, $3) 
+        RETURNING *;
+      `, [username, email, hashedPassword]);
+  
+      return user;
+    } catch (error) {
+      throw new Error(`Error registering user: ${error.message}`);
     }
-    console.log('Passwords hashed successfully!');
-  } catch (error) {
-    console.error('Error hashing passwords:', error.message);
-  } finally {
-    client.end();
   }
+
+/*** Creating Authentication for a user and need to generate a JWT  */
+
+async function login ({ email, password}){
+    try{
+        const {rows:[user]} = await client.query('SELECT * FROM users WHERE email = $1;', [email]);
+        if (!user) throw new Error ('Invalid email or password');
+        
+        const isPasswordValid= await bcrypt.compare(password,user.password);
+        if(!isPasswordValid) throw new Error('Invalid email or password');
+    }
 }
-module.exports = {
-hashPasswords
-};

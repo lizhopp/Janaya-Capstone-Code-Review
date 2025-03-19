@@ -1,13 +1,22 @@
-// const authenticate = (req, res, next) => {
-//   const token = req.header('Authorization')?.replace('Bearer ', '');
-//   if (!token) {
-//     return res.status(401).json({ error: 'Access denied. No token provided.' });
-//   }
-//   try {
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//     req.userId = decoded.userId;
-//     next();
-//   } catch (error) {
-//     res.status(400).json({ error: 'Invalid token.' });
-//   }
-// };
+const client = require('../db'); // Adjust the path based on your folder structure
+const bcrypt = require('bcrypt');
+
+async function hashPasswords() {
+  try {
+    const users = await client.query('SELECT id, password FROM users');
+    for (const user of users.rows) {
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      await client.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, user.id]);
+    }
+    console.log('Passwords hashed successfully!');
+  } catch (error) {
+    console.error('Error hashing passwords:', error.message);
+    throw error;
+  } finally {
+    client.end();
+  }
+}
+
+module.exports = {
+  hashPasswords
+};
