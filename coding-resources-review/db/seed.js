@@ -9,10 +9,8 @@ async function seedDatabase() {
       INSERT INTO users (username, email, password, isAdmin)
       VALUES
         ('admin', 'admin@gmail.com', 'admin123', TRUE),
-        ('testuser', 'testuser@gmail.com', 'testuser123', FALSE),
-        ('guestuser', 'guestuser@gmail.com', 'guestuser123', FALSE),
-        ('user1', 'user1@gmail.com', 'user123', FALSE),
-        ('user2', 'user2@gmail.com', 'user123', FALSE);
+        ('testuser', 'testuser@gmail.com', 'user1', FALSE),
+        ('guestuser', 'guestuser@gmail.com', 'user2', FALSE);
     `);
 
     // Insert resources
