@@ -1,6 +1,31 @@
 const client = require("./db");
+const bcrypt = require('bcrypt');
 require("dotenv").config();
 const JWT_SECRET = process.env.JWT_SECRET || "Crytobytes";
+
+
+// Function to hash passwords
+async function hashPasswords() {
+  const users = [
+    { id: 1, password: 'admin123' },
+    { id: 2, password: 'user123' },
+    { id: 3, password: 'user123' },
+  ];
+
+  try {
+    // Hash and update passwords
+    for (const user of users) {
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      await client.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, user.id]);
+      console.log(`Hashed password for user ${user.id}`);
+    }
+
+    console.log('All passwords have been hashed successfully.');
+  } catch (error) {
+    console.error('Error hashing passwords:', error.message);
+  }
+}
+
 async function seedDatabase() {
   try {
     console.log("Starting to seed database...");
