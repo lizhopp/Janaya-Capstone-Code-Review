@@ -1,4 +1,5 @@
-require("dotenv").config();
+require("dotenv").config({ path: "./db/.env" });
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
 const express = require("express");
 const client = require("./db");
 const bcrypt = require("bcrypt");
@@ -6,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || "Crytobytes";
 
 // middleware
 app.use(cors());
@@ -158,8 +160,12 @@ app.post('/api/auth/register', async (req, res) => {
 
     // Generate a JWT token
     const user = result.rows[0];
+    console.log('User:', user); // Debugging: Log the user object
+    console.log('JWT_SECRET:', process.env.JWT_SECRET); // Debugging: Log the JWT secret
     const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log('Generated Token:', token);
+    console.log('Generated Token:', token); // Debugging: Log the token
+
+    // Return the token
     res.json({ token });
   } catch (error) {
     console.error('Error registering user:', error.message);
@@ -186,14 +192,19 @@ app.post('/api/auth/login', async (req, res) => {
 // Middleware to authenticate requests
 function authenticate(req, res, next) {
   const token = req.header('Authorization')?.replace('Bearer ', '');
+  console.log('Received Token:', token); // Debugging
+
   if (!token) {
     return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('Decoded Token:', decoded); // Debugging
     req.user = decoded;
     next();
   } catch (error) {
+    console.error('JWT Verification Error:', error.message);
     res.status(400).json({ error: 'Invalid token.' });
   }
 }

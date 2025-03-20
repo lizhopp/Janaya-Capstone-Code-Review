@@ -1,5 +1,6 @@
 const client = require("./db");
-
+require("dotenv").config();
+const JWT_SECRET = process.env.JWT_SECRET || "Crytobytes";
 async function seedDatabase() {
   try {
     console.log("Starting to seed database...");
