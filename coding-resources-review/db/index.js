@@ -1,23 +1,22 @@
-const express = require('express');
-const client = require('./db');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const cors = require('cors');
- require('dotenv').config();
-  const PORT = process.env.PORT || 3000;
+require("dotenv").config();
+const express = require("express");
+const client = require("./db");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cors = require("cors");
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-  // middleware
-  app.use(cors)
-  app.use(express.json());
+// middleware
+app.use(cors());
+app.use(express.json());
 
-//  root route 
+//  root route
 app.get("/", (req, res) => {
   res.send("Welcome to the Coding Resource Review API 🚀");
 });
 
-
 // Routes for resources
-
 app.get('/api/resources', async (req, res) => {
   try {
     const result = await client.query('SELECT * FROM resources');
@@ -69,6 +68,7 @@ app.get('/api/resources/:id/reviews', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 app.post('/api/resources/:id/reviews', authenticate, async (req, res) => {
   const { id } = req.params;
   const { rating, comment } = req.body;
@@ -82,7 +82,7 @@ app.post('/api/resources/:id/reviews', authenticate, async (req, res) => {
     console.error('Error adding review:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
-
+});
 
 app.put('/api/reviews/:id', authenticate, async (req, res) => {
   const { id } = req.params;
@@ -102,22 +102,19 @@ app.put('/api/reviews/:id', authenticate, async (req, res) => {
   }
 });
 
-  app.delete('/api/reviews/:id', authenticate, async (req, res) => {
-    const { id } = req.params;
-    try {
-      const result = await client.query('DELETE FROM reviews WHERE id = $1 AND user_id = $2 RETURNING *', [id, req.user.id]);
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: 'Review not found or unauthorized' });
-      }
-      res.status(204).send();
-    } catch (error) {
-      console.error('Error deleting review:', error.message);
-      res.status(500).json({ error: 'Internal Server Error' });
+app.delete('/api/reviews/:id', authenticate, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await client.query('DELETE FROM reviews WHERE id = $1 AND user_id = $2 RETURNING *', [id, req.user.id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Review not found or unauthorized' });
     }
-  });
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting review:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
-
-
 
 // Routes for authentication
 app.get('/api/auth/me', authenticate, async (req, res) => {
@@ -133,14 +130,36 @@ app.get('/api/auth/me', authenticate, async (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   const { username, email, password } = req.body;
+
+  // Validate input
+  if (!username || !email || !password) {
+    return res.status(400).json({ error: 'Username, email, and password are required.' });
+  }
+
   try {
+    // Check if the username or email already exists
+    const existingUser = await client.query(
+      'SELECT * FROM users WHERE username = $1 OR email = $2',
+      [username, email]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: 'Username or email already exists.' });
+    }
+
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert the user into the database
     const result = await client.query(
       'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *',
       [username, email, hashedPassword]
     );
+
+    // Generate a JWT token
     const user = result.rows[0];
     const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    console.log('Generated Token:', token);
     res.json({ token });
   } catch (error) {
     console.error('Error registering user:', error.message);
@@ -164,10 +183,8 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-
-
 // Middleware to authenticate requests
-function authenticateJWT(req, res, next) {
+function authenticate(req, res, next) {
   const token = req.header('Authorization')?.replace('Bearer ', '');
   if (!token) {
     return res.status(401).json({ error: 'Access denied. No token provided.' });

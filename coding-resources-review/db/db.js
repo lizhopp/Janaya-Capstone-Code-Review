@@ -1,6 +1,6 @@
 const { Client } = require('pg');
 require('dotenv').config();
-const JWT_SECRET = process.env.JWT_SECRET || "superSecretKey";
+const JWT_SECRET = process.env.JWT_SECRET || "Crytobytes";
 
 // Initialize the PostgreSQL client
 const client = new Client({
