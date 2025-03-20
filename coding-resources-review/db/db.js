@@ -1,5 +1,6 @@
 const { Client } = require('pg');
 require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET || "superSecretKey";
 
 // Initialize the PostgreSQL client
 const client = new Client({
@@ -12,9 +13,7 @@ client.connect()
   .then(() => console.log('Connected to PostgreSQL database'))
   .catch(err => console.error('Error connecting to PostgreSQL:', err));
 
-module.exports = client;
-
-
+  module.exports = client;
 
 
 
