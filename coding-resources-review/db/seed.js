@@ -4,6 +4,8 @@ async function seedDatabase() {
   try {
     console.log("Starting to seed database...");
 
+    // Clear existing data
+    await client.query('TRUNCATE TABLE users, resources, reviews, favorites RESTART IDENTITY CASCADE;');
     // Insert users
     await client.query(`
       INSERT INTO users (username, email, password, isAdmin)
@@ -15,11 +17,11 @@ async function seedDatabase() {
 
     // Insert resources
     await client.query(`
-      INSERT INTO resources (title, type, language, link, description)
+      INSERT INTO resources (title, type, language, link, description, product_id)
       VALUES
-        ('Introduction to JavaScript', 'video', 'JavaScript', 'https://example.com/js-intro', 'Learn the basics of JavaScript.'),
-        ('Eloquent JavaScript', 'book', 'JavaScript', 'https://eloquentjavascript.net', 'A great book for learning JavaScript.'),
-        ('React Tutorial', 'article', 'JavaScript', 'https://reactjs.org/tutorial', 'Official React tutorial.');
+        ('Introduction to JavaScript', 'video', 'JavaScript', 'https://example.com/js-intro', 'Learn the basics of JavaScript.', 1),
+        ('Eloquent JavaScript', 'book', 'JavaScript', 'https://eloquentjavascript.net', 'A great book for learning JavaScript.', 2),
+        ('React Tutorial', 'article', 'JavaScript', 'https://reactjs.org/tutorial', 'Official React tutorial.', 3);
     `);
 
     // Insert reviews

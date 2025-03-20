@@ -21,4 +21,4 @@ async function dropTables() {
 // Run the function to drop tables
 dropTables()
   .catch(console.error)
-  .finally(() => client.end());
+  .finally(() => client.end())

@@ -8,7 +8,15 @@ function App() {
     <div>
       <h1>Coding Resource Review</h1>
       <ResourceList />
+      <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/resources" element={<Resources />} />
+        <Route path="/reviews" element={<Reviews />} />
+      </Routes>
+    </Router>
     </div>
+
   );
 }
 

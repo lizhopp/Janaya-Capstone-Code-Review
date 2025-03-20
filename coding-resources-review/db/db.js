@@ -3,7 +3,8 @@ require('dotenv').config();
 
 // Initialize the PostgreSQL client
 const client = new Client({
-connectionString: process.env.DATABASE_URL || 'postgres://janayacooper:1116@localhost:5432/coding_review_db'
+connectionString: process.env.DATABASE_URL || 'postgres://janayacooper:1116@localhost:5432/coding_review_db',
+ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
 });
 
 // Connect to the database
