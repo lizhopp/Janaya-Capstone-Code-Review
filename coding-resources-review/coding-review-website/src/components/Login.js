@@ -23,6 +23,7 @@ function Login() {
 
       const data = await response.json();
       localStorage.setItem('token', data.token);
+      console.log('Login successful', data);
       navigate('/profile');
     } catch (error) {
       console.error('Error logging in:', error);
@@ -31,7 +32,7 @@ function Login() {
 
   return (
     <div>
-      <h1>Login</h1>
+      <h3>Login</h3>
       <form onSubmit={handleSubmit}>
         <input
           type="email"

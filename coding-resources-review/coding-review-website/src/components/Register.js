@@ -30,7 +30,7 @@ function Register() {
 
   return (
     <div>
-      <h1>Register</h1>
+      <h3>Register</h3>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
