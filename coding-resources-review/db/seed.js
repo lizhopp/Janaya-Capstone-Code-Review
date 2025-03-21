@@ -34,6 +34,7 @@ async function seedDatabase() {
     await client.query('TRUNCATE TABLE users, resources, reviews, favorites RESTART IDENTITY CASCADE;');
     console.log('Cleared existing data');
     // Insert users
+    console.log('Inserted users');
     await client.query(`
       INSERT INTO users (username, email, password, isAdmin)
       VALUES
@@ -41,8 +42,13 @@ async function seedDatabase() {
         ('user1', 'user1@gmail.com', 'user123', FALSE),
         ('user2', 'user2@gmail.com', 'user123', FALSE);
     `);
-    console.log('Inserted users');
+    console.log('Users inserted successfully.');
+
+    // Hashing the PwD 
+    console.log('Hashing passwords...');
+    await hashPasswords();
     // Insert resources
+    console.log('Inserting resources...');
     await client.query(`
       INSERT INTO resources (title, type, language, link, description, product_id)
       VALUES
@@ -50,8 +56,9 @@ async function seedDatabase() {
         ('Eloquent JavaScript', 'book', 'JavaScript', 'https://eloquentjavascript.net', 'A great book for learning JavaScript.', 2),
         ('React Tutorial', 'article', 'JavaScript', 'https://reactjs.org/tutorial', 'Official React tutorial.', 3);
     `);
-    console.log('Inserted resources');
+    console.log('Resources inserted successfully.');
     // Insert reviews
+    console.log('Inserted reviews');
     await client.query(`
       INSERT INTO reviews (user_id, resource_id, rating, comment)
       VALUES
@@ -59,10 +66,11 @@ async function seedDatabase() {
         (3, 2, 4, 'Very informative book.'),
         (2, 3, 5, 'Excellent tutorial.');
     `);
-    console.log('Inserted reviews');
+    console.log('Reviews inserted successfully.');
 
 
     // Insert favorites
+    console.log('Inserted favorites');
     await client.query(`
       INSERT INTO favorites (user_id, resource_id)
       VALUES
@@ -70,7 +78,7 @@ async function seedDatabase() {
         (3, 2),
         (2, 3);
     `);
-    console.log('Inserted favorites');
+    console.log('Favorites inserted successfully.');
     console.log("Finished seeding database!");
   } catch (error) {
     console.error("Error seeding database:", error.message);

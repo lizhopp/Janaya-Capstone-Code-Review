@@ -62,6 +62,15 @@ id | username | email | password | isadmin | created_at | updated_at
 1 | admin | admin@gmail.com | admin123 | t | 2025-03-18 19:43:54.357697 | 2025-03-18 19:43:54.357697
 2 | user1 | user1@gmail.com | user123 | f | 2025-03-18 19:43:54.357697 | 2025-03-18 19:43:54.357697
 3 | user2 | user2@gmail.com | user123 | f | 2025-03-18 19:43:54.357697 | 2025-03-18 19:43:54.357697
+
+(3 rows) 
+Now changed with hash 
+coding_review_db=# SELECT * FROM users;
+ id | username |      email      |                           password                           | isadmin |         created_at         |         updated_at         
+----+----------+-----------------+--------------------------------------------------------------+---------+----------------------------+----------------------------
+  1 | admin    | admin@gmail.com | $2b$10$ppy2xnCJxr.0ehmh9Lv0febXHLiLFkO5/xi7wXdLk8XSHNK8y.2T2 | t       | 2025-03-20 18:41:17.337918 | 2025-03-20 18:41:17.337918
+  2 | user1    | user1@gmail.com | $2b$10$k94VglTvB7rmaUztyQHql.EafAM9Wtyw9TLom6eZZuootys8FnTVK | f       | 2025-03-20 18:41:17.337918 | 2025-03-20 18:41:17.337918
+  3 | user2    | user2@gmail.com | $2b$10$KXV9jmQ.i3EDJYO1PA5P9uKAVPWWPebYNGH9OtXlPR3N8Y0Cxyu5q | f       | 2025-03-20 18:41:17.337918 | 2025-03-20 18:41:17.337918
 (3 rows)
 
 coding_review_db=# SELECT \* FROM resources;
