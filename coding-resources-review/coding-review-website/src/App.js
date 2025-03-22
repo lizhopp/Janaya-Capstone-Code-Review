@@ -2,13 +2,14 @@ import "./App.css";
 import { useState } from "react";
 import React from "react";
 import { Routes, Route } from "react-router-dom"; // Add BrowserRouter
-import Home from "./components/Home";
 import ResourceDetail from "./components/ResourceDetail";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Profile from "./components/Profile";
 import Navigation from "./components/Navigation";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Home from "./components/Home"
+
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || null);

@@ -1,33 +1,53 @@
 import React, { useEffect, useState } from "react";
-import ResourceDetail from "../components/ResourceDetail";
 
-function Home() {
+function Home({ token }) {
   const [resources, setResources] = useState([]);
-  useEffect(() => {
-    async function fetchResources() {
-      try {
-        const response = await fetch("http://localhost:5000/api/resources"); // Ensure this URL is correct
-        const text = await response.text(); // Read raw response
-        console.log("Raw response:", text); // Debug log
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-        const data = JSON.parse(text); // Convert to JSON
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const response = await fetch('/api/resources');
+        if (!response.ok) {
+          throw new Error('Failed to fetch resources');
+        }
+        const data = await response.json();
         setResources(data);
       } catch (error) {
-        console.error("Error fetching resources:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
     fetchResources();
   }, []);
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
     <div>
-      <h3>Resources</h3>
-      <div>
-        {resources.map((resource) => (
-          <ResourceDetail key={resource.id} resource={resource} />
-        ))}
-      </div>
+      <h1>Welcome to the Coding Resource Review Website</h1>
+      <h2>Resources</h2>
+      {resources.length > 0 ? (
+        <ul>
+          {resources.map((resource) => (
+            <li key={resource.id}>
+              <h3>{resource.title}</h3>
+              <p>{resource.description}</p>
+              <p>Type: {resource.type}</p>
+              <p>Language: {resource.language}</p>
+              <a href={resource.link} target="_blank" rel="noopener noreferrer">
+                Visit Resource
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No resources found.</p>
+      )}
     </div>
   );
 }

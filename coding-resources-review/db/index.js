@@ -1,5 +1,5 @@
 require("dotenv").config({ path: "./db/.env" });
-console.log("JWT_SECRET:", process.env.JWT_SECRET);
+const JWT_SECRET = process.env.JWT_SECRET || "Crytobytes";
 const express = require("express");
 const client = require("./db");
 const bcrypt = require("bcrypt");
@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || "Crytobytes";
+
 
 // middleware
 app.use(cors());
@@ -19,6 +19,22 @@ app.get("/", (req, res) => {
 });
 
 // Routes for resources
+
+app.get('/api/resources/me', authenticate, async (req, res) => {
+  try {
+    const result = await client.query(`
+      SELECT reviews.id, reviews.rating, reviews.comment, resources.title
+      FROM reviews
+      JOIN resources ON reviews.resource_id = resources.id
+      WHERE reviews.user_id = $1;
+    `, [req.user.id]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching user reviews:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.get('/api/resources', async (req, res) => {
   try {
     const result = await client.query('SELECT * FROM resources');
@@ -60,6 +76,21 @@ app.post('/api/resources', authenticate, async (req, res) => {
 });
 
 // Routes for reviews
+app.get('/api/resources/reviews', authenticate, async (req, res) => {
+  try {
+    const result = await client.query(`
+      SELECT reviews.id, reviews.rating, reviews.comment, resources.title
+      FROM reviews
+      JOIN resources ON reviews.resource_id = resources.id
+      WHERE reviews.user_id = $1;
+    `, [req.user.id]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching reviews:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.get('/api/resources/:id/reviews', async (req, res) => {
   const { id } = req.params;
   try {
@@ -114,6 +145,23 @@ app.delete('/api/reviews/:id', authenticate, async (req, res) => {
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting review:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Routes for favorites 
+
+app.get('/api/favorites', authenticate, async (req, res) => {
+  try {
+    const result = await client.query(`
+      SELECT favorites.id, resources.title, resources.description, resources.link
+      FROM favorites
+      JOIN resources ON favorites.resource_id = resources.id
+      WHERE favorites.user_id = $1;
+    `, [req.user.id]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching favorites:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -191,8 +239,13 @@ app.post('/api/auth/login', async (req, res) => {
 
 // Middleware to authenticate requests
 function authenticate(req, res, next) {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const authHeader = req.header('Authorization');
+  const token =  authHeader && authHeader.startsWith('Bearer ')
+  ? authHeader.replace('Bearer ', '')
+  : null;
+
   console.log('Received Token:', token); // Debugging
+  console.log('Authorization Header:', req.header('Authorization'));
 
   if (!token) {
     return res.status(401).json({ error: 'Access denied. No token provided.' });
@@ -212,9 +265,12 @@ function authenticate(req, res, next) {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('Global error handler:', err.message);
-  res.status(500).json({ error: 'Internal Server Error' });
+  if (err.status) {
+    res.status(err.status).json({ error: err.message });
+  } else {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
-
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

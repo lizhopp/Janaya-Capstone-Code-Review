@@ -27,7 +27,7 @@ function Profile() {
       });
 
     // Fetch user reviews
-    fetch('/api/reviews/me', {
+    fetch('/api/resources/me', {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -42,7 +42,7 @@ function Profile() {
       .catch(error => console.error('Error fetching reviews:', error));
 
     // Fetch user favorites
-    fetch('/api/favorites/me', {
+    fetch('/api/favorites/', {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
