@@ -33,7 +33,12 @@ function Navigation({ token, setToken }) {
             <li>
               <Link to="/register">Register</Link>
             </li>
+            <li>
+            
+            <Link to ="/resourcereviews">Resource reviews</Link>
+          </li>
           </>
+
         )}
       </ul>
     </nav>

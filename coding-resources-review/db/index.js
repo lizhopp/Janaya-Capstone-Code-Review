@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 
 // middleware
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 
 //  root route
@@ -76,6 +76,16 @@ app.post('/api/resources', authenticate, async (req, res) => {
 });
 
 // Routes for reviews
+app.get('/api/reviews', async (req, res) => {
+  try {
+    const result = await client.query('SELECT * FROM reviews');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching all reviews:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.get('/api/resources/reviews', authenticate, async (req, res) => {
   try {
     const result = await client.query(`
@@ -93,8 +103,10 @@ app.get('/api/resources/reviews', authenticate, async (req, res) => {
 
 app.get('/api/resources/:id/reviews', async (req, res) => {
   const { id } = req.params;
+  console.log(`Fetching reviews for resource ID: ${id}`); // Debugging
   try {
     const result = await client.query('SELECT * FROM reviews WHERE resource_id = $1', [id]);
+    console.log('Query result:', result.rows); // Debugging
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching reviews:', error.message);

@@ -9,6 +9,7 @@ import Profile from "./components/Profile";
 import Navigation from "./components/Navigation";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./components/Home"
+import ResourceReviews from "./components/ResourceReviews";
 
 
 function App() {
@@ -42,6 +43,10 @@ function App() {
                 <Profile setToken={setToken} token={token} />
               </ProtectedRoute>
             }
+            />
+            <Route
+            path="/resourcereviews"
+            element={<ResourceReviews setToken={setToken} token={token} />}
           />
         </Routes>
       </div>

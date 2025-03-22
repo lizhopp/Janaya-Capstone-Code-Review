@@ -14,7 +14,7 @@ function Profile() {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         
       },
-    
+     
     })
       .then(response => {
         if (!response.ok) {

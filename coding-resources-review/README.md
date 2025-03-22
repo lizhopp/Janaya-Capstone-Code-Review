@@ -6,7 +6,7 @@ Category Filtering
 API Integration
 Authentication 
 Search 
-Bookmark Feature
+
 
 Schema:
 Created the schema tables
