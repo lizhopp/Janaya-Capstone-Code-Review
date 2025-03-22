@@ -35,7 +35,10 @@ function Navigation({ token, setToken }) {
             </li>
             <li>
             
-            <Link to ="/resourcereviews">Resource reviews</Link>
+            <Link to ="/resourcereviews">Resource Reviews</Link>
+          </li>
+          <li>
+          <Link to ="/resourcemanagement">Resource Management </Link>
           </li>
           </>
 

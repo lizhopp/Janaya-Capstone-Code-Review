@@ -10,6 +10,7 @@ import Navigation from "./components/Navigation";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./components/Home"
 import ResourceReviews from "./components/ResourceReviews";
+import ResourceManagement from "./components/ResourceManagement";
 
 
 function App() {
@@ -48,6 +49,10 @@ function App() {
             path="/resourcereviews"
             element={<ResourceReviews setToken={setToken} token={token} />}
           />
+          <Route
+            path="/resourcemanagement"
+            element={<ResourceManagement setToken={setToken} token={token} />}
+            />
         </Routes>
       </div>
     </div>
