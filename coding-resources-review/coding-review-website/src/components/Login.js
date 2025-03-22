@@ -54,6 +54,6 @@ function Login({ setToken }) { // Destructure setToken from props
       {error && <p style={{ color: 'red' }}>{error}</p>}
     </form>
   );
-}
+} 
 
 export default Login;
