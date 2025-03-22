@@ -12,7 +12,9 @@ function Profile() {
     fetch('/api/auth/me', {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
+        
       },
+    
     })
       .then(response => {
         if (!response.ok) {
@@ -21,6 +23,7 @@ function Profile() {
         return response.json();
       })
       .then(data => setUser(data))
+      
       .catch(error => {
         console.error('Error fetching user:', error);
         navigate('/login'); // Redirect to login if unauthorized
