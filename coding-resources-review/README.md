@@ -96,3 +96,7 @@ id | user_id | resource_id
 1 | 2 | 1
 2 | 3 | 2
 3 | 2 | 3
+
+
+Front end deployment : https://gorgeous-sopapillas-390e00.netlify.app/
+Back end deployment : 
