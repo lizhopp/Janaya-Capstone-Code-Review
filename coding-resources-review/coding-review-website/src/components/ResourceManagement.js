@@ -6,6 +6,7 @@ function ResourceManagement() {
   const [description, setDescription] = useState("");
   const [type, setType] = useState("");
   const [language, setLanguage] = useState("");
+  const [product_id,setProduct_id]= useState("");
   const [link, setLink] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -36,29 +37,34 @@ function ResourceManagement() {
     setLoading(true);
     setError("");
 
-    const resourceData = { title, description, type, language, link };
+    const resourceData ={ title, type, language, link, description, product_id };
+    console.log("Resource Data:", resourceData); // Debugging
 
     try {
       const response = await fetch("/api/resources", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(resourceData),
       });
-
+      console.log("Response Status:", response.status); // Debugging
       if (!response.ok) {
         throw new Error("Failed to add resource");
       }
 
       const newResource = await response.json();
+      console.log("New Resource:", newResource); // Debugging
       setResources((prevResources) => [...prevResources, newResource]); // Add the new resource to the list
       setTitle("");
       setDescription("");
       setType("");
       setLanguage("");
       setLink("");
+      setProduct_id("");
     } catch (error) {
+       console.error("Error Adding Resource:", error.message); // Debugging
       setError(error.message);
     } finally {
       setLoading(false);

@@ -60,14 +60,17 @@ app.get('/api/resources/:id', async (req, res) => {
 });
 
 app.post('/api/resources', authenticate, async (req, res) => {
+  console.log("POST /api/resources route hit");
   if (!req.user.isAdmin) return res.status(403).json({ message: 'Forbidden' });
-
+  console.log('User is not an admin:', req.user);
   const { title, type, language, link, description, product_id } = req.body;
+  console.log('Received Data:', { title, type, language, link, description, product_id }); 
   try {
     const result = await client.query(
       'INSERT INTO resources (title, type, language, link, description, product_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
       [title, type, language, link, description, product_id]
     );
+    console.log('Resource Created:', result.rows[0]);
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error creating resource:', error.message);
@@ -241,7 +244,7 @@ app.post('/api/auth/login', async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, username: user.username, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
   } catch (error) {
     console.error('Error logging in:', error.message);
