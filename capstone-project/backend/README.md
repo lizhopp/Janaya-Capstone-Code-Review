@@ -23,9 +23,9 @@ This project is a full-stack application designed to provide a platform for user
 ```
 capstone-project
 /backend
-  ├── /db
-  │   ├── index.js (PostgreSQL pool setup)
-  │   ├── db.js(DB schema)
+  ├── /server
+  │   ├── db.js (PostgreSQL client setup and DB schema )
+  │   ├── index.js( api routes and starting the server )
   │   ├── seed.js (Seed data)
   ├── /models
   │   ├── userModel.js
@@ -42,8 +42,7 @@ capstone-project
   ├── /middleware
   │   ├── authMiddleware.js (JWT/auth checks)
   │   ├── adminMiddleware.js (isAdmin checks)
-  ├── app.js (Express setup)
-  ├── server.js (Start server)
+  
 
   /frontend
   ├── /src
